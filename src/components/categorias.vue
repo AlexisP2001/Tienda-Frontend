@@ -5,30 +5,33 @@
   </v-snackbar>
     <v-container>
       <template>
-        <v-data-table class="mx-auto mt-5 elevation-15" max-width="900" :headers="columnas" :items="categorias"  :search="search">
+          <template>
+        <v-text-field
+          v-model="search"
+          label="Buscar"
+          class="mx-8"
+        ></v-text-field>
+      </template>
+        <v-data-table class="mx-8 mt-5 elevation-15" width="500" :headers="columnas" :items="categorias"  :search="search">
           <template v-slot:top>
             <v-toolbar  flat>
 
               <v-toolbar-title>Categorias</v-toolbar-title>
 
               <v-spacer></v-spacer>
-              <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details  ></v-text-field>
               <v-divider class="mx-4"   inset vertical></v-divider>
 
               <v-spacer></v-spacer>
               <v-dialog v-model="dialog"  max-width="500px"  >
 
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn  color="primary"  dark class="mb-2" v-bind="attrs"  v-on="on" >   Añadir  </v-btn>
-                  <v-icon  medium class="mr-4"   @click="crearPDF()" >  mdi-{{icons[3]}} </v-icon>
+                  <v-btn  color="#72128E"  dark class="mb-2" v-bind="attrs"  v-on="on" >   Añadir  </v-btn>
                 </template>
 
                 <v-card>
                   <v-card-text>
                     <v-text-field  v-model="editedItem.nombre" :counter="50" label="Nombre" :rules="rulesNombre" required ></v-text-field>
-                    <v-text-field  v-model="editedItem.descripcion" :counter="255" label="Descripcion" :rules="rulesDescripcion" ></v-text-field>
                     <v-btn  color="blue darken-1" class="mr-4" @click="guardar" > Guardar </v-btn>
-                    <v-btn  color="blue darken-1"  class="mr-4" @click="reset"> Limpiar </v-btn>
                     <v-btn   color="blue darken-1" class="mr-4" @click="dialog=false"> Cancelar </v-btn>
                   </v-card-text>    
                   
@@ -59,10 +62,10 @@
 
 
 <script>
-// import axios from 'axios'
+import axios from 'axios'
 // import jsPDF from 'jspdf'
 // import 'jspdf-autotable'
-// import Swal from 'sweetalert2'
+import Swal from 'sweetalert2'
   export default {
     data: () => ({      
       mensajeError:false,
@@ -76,177 +79,143 @@
       dialog: false,
       dialogDelete: false,
 
-    //   rulesNombre: [
-    //     value => !!value || 'Required.',
-    //     value => (value && value.length <= 50) || 'Max 3 caracteres',
-    //   ],
-    //   rulesDescripcion:[
-    //     value => (value && value.length <= 255) || 'Max 255 caracteres'
-    //   ],
+      rulesNombre: [
+        value => !!value || 'Required.',
+        value => (value && value.length <= 50) || 'Max 3 caracteres',
+      ],
+      rulesDescripcion:[
+        value => (value && value.length <= 255) || 'Max 255 caracteres'
+      ],
 
       columnas: [
         { text: 'Nombre', value: 'nombre' },
-        { text: 'Descripcion', value: 'descripcion' },
+        {},
+        {},
+        {},
+        {},
         { text: 'Actions', value: 'actions', sortable: false }
       ],
       
       editedIndex: -1,
 
-      categorias: [{estado:'', nombre:'', descripcion:''}],
+      categorias: [{estado:'', nombre:''}],
 
-      editedItem: {  estado:'', nombre: '', descripcion: '' },
+      editedItem: {  estado:'', nombre: ''},
 
-      defaultItem: {  estado:'', nombre: '', descripcion: '' },
+      defaultItem: {  estado:'', nombre: '' },
     }),
 
     created(){
-    //   this.obtenerCategorias();
+      this.obtenerCategorias();
     },
 
     methods: {
-    //   msjcompra:function(tata){
-    //     Swal.fire({
-    //       position: 'top',
-    //       icon: 'error',
-    //       title: tata,
-    //       showConfirmButton: false,
-    //       //5000 son 5 seg
-    //       timer: 2000})
-    //   },
-    //   obtenerCategorias(){
-    //     let header = {headers:{"token" : this.$store.state.token}};
-    //     axios.get("categoria",header)
-    //     .then(response =>{
-    //       console.log(response);
-    //       this.categorias = response.data.categoria
-    //     })
-    //     .catch((error) =>{
-    //       console.log(error);
-    //       if(!error.response.data.msg){
-    //         console.log(error.response);
-    //         this.msgError = error.response.data.errors[0].msg;
-    //         this.msjcompra(this.msgError);
-    //       }else{
-    //         this.msgError = error.response.data.msg;
-    //         console.log(error.response.data.msg);
-    //         this.msgError =error.response.data.msg;
-    //         this.msjcompra(this.msgError);
-    //       }
-    //       //window.setInterval(() => {this.mensajeError = false; console.log("hide alert after 3 seconds");}, 3000) 
-    //     })
-    //   },
+      msjcompra:function(tata){
+        Swal.fire({
+          position: 'top',
+          icon: 'error',
+          title: tata,
+          showConfirmButton: false,
+          //5000 son 5 seg
+          timer: 2000})
+      },
+      obtenerCategorias(){
+        let header = {headers:{"token" : this.$store.state.token}};
+        axios.get("categoria",header)
+        .then(response =>{
+          console.log(response);
+          this.categorias = response.data.categoria
+          if(response.estado ==1){
+              this.estadoC="Activo"
+          }else{
+              this.estadoC="Inactivo"
+          }
+        })
+        .catch((error) =>{
+          console.log(error);
+          //window.setInterval(() => {this.mensajeError = false; console.log("hide alert after 3 seconds");}, 3000) 
+        })
+      },
 
       reset(){
         this.editedItem.nombre=''
-        this.editedItem.descripcion=''
       },
 
-    //   activarDesactivarItem (accion , item) {
-    //     let id = item._id;
-    //     console.log(accion);
-    //     if(accion == 2){
-    //       console.log(id);
-    //       let me = this
-    //       let header = {headers:{"token" : this.$store.state.token}};
-    //       axios.put(`categoria/desactivar/${id}`,{estado:0}, header)
-    //       .then(function(){
-    //         me.obtenerCategorias();
-    //       })
-    //       .catch(function(error){
-    //         console.log(error);
-    //         if(!error.response.data.msg){
-    //           console.log(error.response);
-    //           this.msgError = error.response.data.errors[0].msg;
-    //           this.msjcompra(this.msgError);
-    //         }else{
-    //           this.msgError = error.response.data.msg;
-    //           console.log(error.response.data.msg);
-    //           this.msgError =error.response.data.msg;
-    //           this.msjcompra(this.msgError);
-    //         }
+      activarDesactivarItem (accion , item) {
+        let id = item._id;
+        console.log(accion);
+        if(accion == 2){
+          console.log(id);
+          let me = this
+          let header = {headers:{"token" : this.$store.state.token}};
+          axios.put(`categoria/desactivar/${id}`,{estado:0}, header)
+          .then(function(){
+            me.obtenerCategorias();
+          })
+          .catch(function(error){
+            console.log(error);
+          });
+        }else if (accion==1){
+          console.log(id);
+          let me = this
+          let header = {headers:{"token" : this.$store.state.token}};
+          axios.put(`categoria/activar/${id}`,{estado:1},header)
+          .then(function(){
+            me.obtenerCategorias();
+          })
+          .catch(function(error){
+            console.log(error);
+          });
+        }
+      },
 
-    //       });
-    //     }else if (accion==1){
-    //       console.log(id);
-    //       let me = this
-    //       let header = {headers:{"token" : this.$store.state.token}};
-    //       axios.put(`categoria/activar/${id}`,{estado:1},header)
-    //       .then(function(){
-    //         me.obtenerCategorias();
-    //       })
-    //       .catch(function(error){
-    //         console.log(error);
-    //         if(!error.response.data.msg){
-    //           console.log(error.response);
-    //           this.msgError = error.response.data.errors[0].msg;
-    //           this.msjcompra(this.msgError);
-    //         }else{
-    //           this.msgError = error.response.data.msg;
-    //           console.log(error.response.data.msg);
-    //           this.msgError =error.response.data.msg;
-    //           this.msjcompra(this.msgError);
-    //         }
-    //       });
-    //     }
-    //   },
-
-    //   guardar(){
-    //     if (this.bd == 0 ){
-    //       console.log('estoy guardando'+this.bd);
-    //       let header = {headers:{"token" : this.$store.state.token}};
-    //       const me = this;
-    //       axios.post('categoria',{ nombre:this.editedItem.nombre,descripcion:this.editedItem.descripcion},header)
-    //         .then((response)=>{
-    //           console.log(response);
-    //           me.obtenerCategorias(),
-    //           this.limpiar
-    //         })
-    //         .catch((error)=>{
-    //           console.log(error.response);
-    //           //this.mensajeError=true 
-    //           if(!error.response.data.msg){
-    //             console.log(error.response);
-    //             this.msgError = error.response.data.errors[0].msg
-    //             this.msjcompra(this.msgError);
-    //           }else{
-    //             this.msgError = error.response.data.msg
-    //             console.log(error.response.data.msg);
-    //             this.msjcompra(this.msgError);
-    //           }
-    //         })
-    //     }else{
-    //       console.log('estoy enviando'+this.bd);
-    //       let header = {headers:{"token" : this.$store.state.token}};
-    //       const me = this;
-    //       axios.put(`categoria/${this.id}`,{ nombre:this.editedItem.nombre, descripcion:this.editedItem.descripcion }, header )
-    //         .then((response)=>{
-    //           console.log(response);
-    //           me.obtenerCategorias(),
-    //           this.limpiar
-    //         })
-    //         .catch((error)=>{
-    //           console.log(error.response);
-    //           if(!error.response.data.msg){
-    //             console.log(error.response);
-    //             this.msgError = error.response.data.errors[0].msg
-    //             this.msjcompra(this.msgError);
-    //           }else{
-    //             this.msgError = error.response.data.msg
-    //             console.log(error.response.data.msg);
-    //             this.msjcompra(this.msgError);
-    //           }
+      guardar(){
+        if (this.bd == 0 ){
+          console.log('estoy guardando'+this.bd);
+          let header = {headers:{"token" : this.$store.state.token}};
+          const me = this;
+          axios.post('categoria',{ nombre:this.editedItem.nombre},header)
+            .then((response)=>{
+              console.log(response);
+              me.obtenerCategorias(),
+              this.limpiar
+            })
+            .catch((error)=>{
+              console.log(error.response);
+              //this.mensajeError=true 
+              if(!error.response.data.msg){
+                console.log(error.response);
+                this.msgError = error.response.data.errors[0].msg
+                this.msjcompra(this.msgError);
+              }else{
+                this.msgError = error.response.data.msg
+                console.log(error.response.data.msg);
+                this.msjcompra(this.msgError);
+              }
+            })
+        }else{
+          console.log('estoy enviando'+this.bd);
+          let header = {headers:{"token" : this.$store.state.token}};
+          const me = this;
+          axios.put(`categoria/actualizar/${this.id}`,{ nombre:this.editedItem.nombre}, header )
+            .then((response)=>{
+              console.log(response);
+              me.obtenerCategorias(),
+              this.limpiar
+            })
+            .catch((error)=>{
+              console.log(error.response);
               
-    //         })
-    //     }
-    //   },
-    //   editar(item){
-    //     console.log(item);
-    //     this.bd = 1;
-    //     this.id= item._id;
-    //     this.editedItem.nombre=item.nombre;
-    //     this.editedItem.descripcion=item.descripcion;
-    //     this.dialog=true;
-    //   },
+            })
+        }
+      },
+      editar(item){
+        console.log(item);
+        this.bd = 1;
+        this.id= item._id;
+        this.editedItem.nombre=item.nombre;
+        this.dialog=true;
+      },
       
     //   crearPDF(){
     //     var columns =[

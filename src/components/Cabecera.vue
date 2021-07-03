@@ -1,11 +1,10 @@
 <template>
   <div v-if="this.$store.state.token != ''" >
     <v-card class="mx-auto overflow-hidden" height="100%" width="100%">
-      <v-system-bar color="#128E75"></v-system-bar>
-      <v-app-bar color="#17A589">
+      <v-app-bar color="#72128E">
         <v-app-bar-nav-icon @click="drawer = true" class="white--text"></v-app-bar-nav-icon>
         <v-spacer></v-spacer>
-        <v-btn @click="cerrarSesion()" style=" position: left" color="#128E75" primary--text > <v-icon>mdi-logout</v-icon>Salir</v-btn>
+        <v-btn @click="cerrarSesion()" style=" position: left" color="#72128E" primary--text > <v-icon>mdi-logout</v-icon>Salir</v-btn>
       </v-app-bar>
 
     </v-card>
@@ -65,13 +64,13 @@
         },
         { action: 'mdi-shopping',
           items: [
-            { title: 'Compras' ,ruta:{path:'/compra'}},
+            { title: 'Compras' ,ruta:{path:'/compras'}},
             { title: 'Proveedores',ruta:{path:'/listarProveedores'} },
           ],
           title: 'Compras',
         },
         {action: 'mdi-cart',
-          items: [{ title: 'Ventas' ,ruta:{path:'/venta'}},
+          items: [{ title: 'Ventas' ,ruta:{path:'/ventas'}},
                   { title: 'Clientes' ,ruta:{path:'/listarClientes'}}
           ],
           title: 'Ventas',

@@ -2,7 +2,7 @@
     <v-app>
     <!--<v-alert type="error" v-if="mensajeError==true" >{{msgError}} </v-alert>-->
       <v-main>
-          <v-form v-model="valid" width="500" class="form-registro mx-auto mt-9">
+          <v-form v-model="valid" width="500" class="form-registro mx-auto mt-15">
             <v-card-title class="titulo">Iniciar Sesion</v-card-title>
             <v-card-text>
               <v-text-field v-model="nombre" id="caja"   class="form-input" label="Usuario" color="#72128E"  required  :rules="nameRules" prepend-icon="mdi-account-circle"/>
